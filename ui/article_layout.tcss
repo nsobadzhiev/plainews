@@ -1,0 +1,9 @@
+#article-title {
+    text-align: center;
+    text-style: bold;
+    margin: 2;
+}
+
+#article-text {
+    margin: 2 5 2 5;
+}

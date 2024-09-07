@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 class HomeScreen(Screen[None]):
 
-    CSS_PATH = 'home_layout.tcss'
+    CSS_PATH = ['home_layout.tcss', 'article_layout.tcss']
 
     config = Config()
     feed_manager = FeedManager()

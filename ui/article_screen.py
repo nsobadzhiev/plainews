@@ -20,7 +20,7 @@ class ArticleScreen(Widget):
         body.text = self.text
 
     def compose(self) -> ComposeResult:
-        yield Static(self.title)
-        area = TextArea(self.text)
+        yield Static(self.title, id='article-title')
+        area = TextArea(self.text, id='article-text')
         area.read_only = True
         yield area
