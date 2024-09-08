@@ -1,19 +1,13 @@
+Screen {
+    layout: grid;
+    grid-size: 3;
+    grid-columns: 20% 20% 60%;
+}
+
 #sidebar-feeds {
-    dock: left;
     height: 100%;
-    color: #0f2b41;
-    background: dodgerblue;
 }
 
 #sidebar-articles {
-    dock: left;
     height: 100%;
-}
-
-.sidebar-collapsed {
-    width: 0%;
-}
-
-.sidebar-expanded {
-    width: 20%;
 }

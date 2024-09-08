@@ -6,8 +6,8 @@ from textual.widgets import TextArea, Static
 
 class ArticleScreen(Widget):
 
-    title = reactive("")
-    text = reactive('')
+    title = reactive("No article selected")
+    text = reactive('Select an item on the left')
 
     def __init__(self, text: str, id: str | None = None):
         super().__init__(id=id)

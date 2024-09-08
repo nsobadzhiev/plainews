@@ -5,6 +5,8 @@ from textual import on
 from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.widgets import Header, Footer
+from textual.widgets.option_list import Option
+from textual.widgets.option_list import Separator
 
 from article_extraction import extract_article
 from config.config import Config
@@ -45,7 +47,7 @@ class HomeScreen(Screen[None]):
         yield Header()
         yield FeedsList(*feed_titles, id='sidebar-feeds', classes='sidebar-expanded')
         yield ArticlesList(*[], id='sidebar-articles', classes='sidebar-collapsed')
-        yield ArticleScreen("Example article")
+        yield ArticleScreen("")
         yield Footer()
 
     @on(FeedsList.OptionSelected)
@@ -55,8 +57,7 @@ class HomeScreen(Screen[None]):
             self.selected_feed = self.feed_manager.get_feeds()[selected_index]
             articles_list = self.query_one(ArticlesList)
             articles_list.clear_options()
-            articles_list.add_options(list(map(lambda e: e.title, self.selected_feed.entries)))
-            articles_list.add_class('sidebar-expanded')
+            articles_list.add_options(self._options_for_feed(self.selected_feed))
         if isinstance(option.option_list, ArticlesList):
             article_screen = self.query_one(ArticleScreen)
             feed_entry = self.selected_feed.entries[option.option_index]
@@ -65,6 +66,19 @@ class HomeScreen(Screen[None]):
             article_screen.text = self.selected_article.text
             article_screen.update_text()
 
+    @staticmethod
+    def _options_for_feed(feed: Feed) -> list[Option | Separator]:
+        """
+        Returns the options to be added to the FeedsList, sorted chronologically
+        :param feed: the selected Feed whose articles will be listed
+        :return: a list of options, split by separators, ready to be displayed by an OptionsList
+        """
+        latest_entries = sorted(feed.entries, key=lambda e: e.update_date, reverse=True)
+        options = []
+        for entry in latest_entries:
+            options.append(entry.title)
+            options.append(Separator())
+        return options
 
     # @on(ScreenResume)
     # async def reload_screen(self) -> None:
