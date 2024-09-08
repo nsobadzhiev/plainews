@@ -1,7 +1,9 @@
 from litellm import completion
 
+from config.config import Config
 
 OLLAMA_BASE = "http://localhost:11434"
+config = Config()
 
 def llm_completion(system_prompt: str, payload: str) -> str:
     response = completion(
@@ -9,12 +11,11 @@ def llm_completion(system_prompt: str, payload: str) -> str:
         messages=_get_messages(system_prompt, payload),
         api_base=OLLAMA_BASE,
     )
-    return response.object
+    return response.choices[0].message.content
 
 
 def _get_llm_model() -> str:
-    # TODO: read it from config
-    return "ollama/llama2"
+    return config.llm_model
 
 
 def _get_messages(system_prompt: str, payload: str) -> list[dict]:
