@@ -14,6 +14,7 @@ from config.config import Config
 from model.article import Article
 from model.feed import Feed
 from model.feed_manager import FeedManager
+from transform.article_translator import ArticleTranslator
 from ui.article_screen import ArticleScreen
 from ui.articles_list import ArticlesList
 from ui.feeds_list import FeedsList
@@ -27,6 +28,8 @@ class HomeScreen(Screen[None]):
 
     BINDINGS = [
         ("o", "open_in_browser", "Open in browser"),
+        ("t", "translate_article", "Translate"),
+        ("s", "summarize_article", "Summarize"),
     ]
 
     config = Config()
@@ -64,16 +67,28 @@ class HomeScreen(Screen[None]):
             articles_list.clear_options()
             articles_list.add_options(self._options_for_feed(self.selected_feed))
         if isinstance(option.option_list, ArticlesList):
-            article_screen = self.query_one(ArticleScreen)
             feed_entry = self.selected_feed.entries[option.option_index]
             self.selected_article = extract_article(feed_entry.link)
-            article_screen.title = self.selected_article.title
-            article_screen.text = self.selected_article.text
-            article_screen.update_text()
+            self.update_article_screen(self.selected_article)
 
     def action_open_in_browser(self):
         if self.selected_article:
             webbrowser.open(self.selected_article.url)
+
+    def action_translate_article(self):
+        if self.selected_article:
+            translator = ArticleTranslator(self.config.language)
+            self.selected_article = translator.transformed_article(self.selected_article)
+            self.update_article_screen(self.selected_article)
+
+    def _article_screen(self) -> ArticleScreen | None:
+        return self.query_one(ArticleScreen)
+
+    def update_article_screen(self, article: Article):
+        screen = self._article_screen()
+        screen.title = article.title
+        screen.text = article.text
+        screen.update_text()
 
     @staticmethod
     def _options_for_feed(feed: Feed) -> list[Option | Separator]:
