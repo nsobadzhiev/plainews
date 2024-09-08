@@ -1,4 +1,5 @@
 import logging
+import webbrowser
 from typing import cast
 
 from textual import on
@@ -23,6 +24,10 @@ logger = logging.getLogger(__name__)
 class HomeScreen(Screen[None]):
 
     CSS_PATH = ['home_layout.tcss', 'article_layout.tcss']
+
+    BINDINGS = [
+        ("o", "open_in_browser", "Open in browser"),
+    ]
 
     config = Config()
     feed_manager = FeedManager()
@@ -65,6 +70,10 @@ class HomeScreen(Screen[None]):
             article_screen.title = self.selected_article.title
             article_screen.text = self.selected_article.text
             article_screen.update_text()
+
+    def action_open_in_browser(self):
+        if self.selected_article:
+            webbrowser.open(self.selected_article.url)
 
     @staticmethod
     def _options_for_feed(feed: Feed) -> list[Option | Separator]:
