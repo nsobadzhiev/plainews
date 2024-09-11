@@ -18,7 +18,7 @@ class StoredArticles:
 
     def article_for_url(self, url: str) -> Article | None:
         return self.articles[url]
-        
+
     def save_articles(self):
         pickle.dump(self.articles, self.storage_file)
 

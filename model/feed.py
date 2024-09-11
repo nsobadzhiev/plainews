@@ -14,5 +14,5 @@ class FeedEntry(BaseModel):
 class Feed(BaseModel):
     url: str
     title: str
-    subtitle: str
+    subtitle: str | None
     entries: list[FeedEntry]
