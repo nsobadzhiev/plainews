@@ -5,6 +5,6 @@ TRANSLATE_PROMPT = f"""
 Translate the following text to {LANGUAGE_TOKEN}. Don't paraphrase or change the text in any other way. Keep the 
 formatting."""
 
-def translate_text(text: str, language: str) -> str:
+async def translate_text(text: str, language: str) -> str:
     prompt = TRANSLATE_PROMPT.replace(LANGUAGE_TOKEN, language)
-    return llm_completion(prompt, text)
+    return await llm_completion(prompt, text)

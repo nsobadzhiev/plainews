@@ -16,7 +16,7 @@ class TransformationBuilder:
     def __init__(self, transformers: list[ArticleTransformer]):
         self.transformers = transformers
 
-    def transform(self, article: Article) -> Article:
+    async def transform(self, article: Article) -> Article:
         result = article
         for transformer in self.transformers:
             result = transformer.transformed_article(result)

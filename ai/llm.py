@@ -1,12 +1,12 @@
-from litellm import completion
+from litellm import acompletion
 
 from config.config import Config
 
 OLLAMA_BASE = "http://localhost:11434"
 config = Config()
 
-def llm_completion(system_prompt: str, payload: str) -> str:
-    response = completion(
+async def llm_completion(system_prompt: str, payload: str) -> str:
+    response = await acompletion(
         model=_get_llm_model(),
         messages=_get_messages(system_prompt, payload),
         api_base=OLLAMA_BASE,

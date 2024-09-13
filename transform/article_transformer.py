@@ -3,7 +3,7 @@ from model.article import Article
 
 class ArticleTransformer:
 
-    def transformed_article(self, article: Article) -> Article:
+    async def transformed_article(self, article: Article) -> Article:
         """
         Performs a transformation of the article - it post-processes the input
         and brings a more refined version (in a different language, just a summary etc.)

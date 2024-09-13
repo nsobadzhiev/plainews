@@ -3,6 +3,7 @@ import webbrowser
 from typing import cast
 
 from textual import on
+from textual import work
 from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.widgets import Header, Footer
@@ -75,11 +76,16 @@ class HomeScreen(Screen[None]):
         if self.selected_article:
             webbrowser.open(self.selected_article.url)
 
-    def action_translate_article(self):
+    async def action_translate_article(self):
         if self.selected_article:
-            translator = ArticleTranslator(self.config.language)
-            self.selected_article = translator.transformed_article(self.selected_article)
-            self.update_article_screen(self.selected_article)
+            self.notify("Translating article. Please wait...")
+            self._translate_article()
+
+    @work(exclusive=True)
+    async def _translate_article(self):
+        translator = ArticleTranslator(self.config.language)
+        self.selected_article = await translator.transformed_article(self.selected_article)
+        self.update_article_screen(self.selected_article)
 
     def _article_screen(self) -> ArticleScreen | None:
         return self.query_one(ArticleScreen)
