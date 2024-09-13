@@ -31,7 +31,7 @@ def parse_rss_feed(feed_url: str) -> Feed:
     return Feed(
         title=title,
         subtitle=subtitle,
-        entries=entries,
+        entries=sorted(entries, key=lambda e: e.update_date, reverse=True),
         url=feed_url,
     )
 

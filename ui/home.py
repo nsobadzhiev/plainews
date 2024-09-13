@@ -97,9 +97,8 @@ class HomeScreen(Screen[None]):
         :param feed: the selected Feed whose articles will be listed
         :return: a list of options, split by separators, ready to be displayed by an OptionsList
         """
-        latest_entries = sorted(feed.entries, key=lambda e: e.update_date, reverse=True)
         options = []
-        for entry in latest_entries:
+        for entry in feed.entries:
             options.append(entry.title)
             options.append(Separator())
         return options
