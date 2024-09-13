@@ -9,6 +9,7 @@ from textual.screen import Screen
 from textual.widgets import Header, Footer
 from textual.widgets.option_list import Option
 from textual.widgets.option_list import Separator
+from textual.worker import Worker, WorkerState
 
 from article_extraction import extract_article
 from config.config import Config
@@ -81,11 +82,20 @@ class HomeScreen(Screen[None]):
             self.notify("Translating article. Please wait...")
             self._translate_article()
 
-    @work(exclusive=True)
+    @work(exclusive=True, exit_on_error=False)
     async def _translate_article(self):
         translator = ArticleTranslator(self.config.language)
         self.selected_article = await translator.transformed_article(self.selected_article)
         self.update_article_screen(self.selected_article)
+
+    async def on_worker_state_changed(self, event: Worker.StateChanged) -> None:
+        """Called when the worker state changes."""
+        if event.state == WorkerState.ERROR:
+            self.notify(
+                title=self._error_title_for_worker(event.worker),
+                message=f"Error: {str(event.worker.error)[:300]}",
+                severity="error")
+            self.log(event)
 
     def _article_screen(self) -> ArticleScreen | None:
         return self.query_one(ArticleScreen)
@@ -108,6 +118,14 @@ class HomeScreen(Screen[None]):
             options.append(entry.title)
             options.append(Separator())
         return options
+
+    @staticmethod
+    def _error_title_for_worker(worker: Worker) -> str | None:
+        titles_dict = {
+            '_translate_article': "Translation failed",
+            '_summarize_article': "Summarization failed",
+        }
+        return titles_dict[worker.name] if worker.name in titles_dict else None
 
     # @on(ScreenResume)
     # async def reload_screen(self) -> None:
