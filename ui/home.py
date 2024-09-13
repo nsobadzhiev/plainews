@@ -16,6 +16,7 @@ from config.config import Config
 from model.article import Article
 from model.feed import Feed
 from model.feed_manager import FeedManager
+from transform.article_summary import ArticleSummary
 from transform.article_translator import ArticleTranslator
 from ui.article_screen import ArticleScreen
 from ui.articles_list import ArticlesList
@@ -82,10 +83,21 @@ class HomeScreen(Screen[None]):
             self.notify("Translating article. Please wait...")
             self._translate_article()
 
+    async def action_summarize_article(self):
+        if self.selected_article:
+            self.notify("Summarizing. Please wait...")
+            self._summarize_article()
+
     @work(exclusive=True, exit_on_error=False)
     async def _translate_article(self):
         translator = ArticleTranslator(self.config.language)
         self.selected_article = await translator.transformed_article(self.selected_article)
+        self.update_article_screen(self.selected_article)
+
+    @work(exclusive=True, exit_on_error=False)
+    async def _summarize_article(self):
+        summarizer = ArticleSummary(self.config.summarization_target_length)
+        self.selected_article = await summarizer.transformed_article(self.selected_article)
         self.update_article_screen(self.selected_article)
 
     async def on_worker_state_changed(self, event: Worker.StateChanged) -> None:

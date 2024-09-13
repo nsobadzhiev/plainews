@@ -12,6 +12,7 @@ class Config(BaseSettings):
         "https://rss.sueddeutsche.de/rss/Topthemen",
         "https://feeds.arstechnica.com/arstechnica/index",
     ]
+    summarization_target_length: int | None = 250
 
     # There are two options - reading the config from a file in the PWD, or reading
     # a file from the home directory

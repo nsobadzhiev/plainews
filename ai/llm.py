@@ -19,7 +19,12 @@ def _get_llm_model() -> str:
 
 
 def _get_messages(system_prompt: str, payload: str) -> list[dict]:
+    # Seems that Ollama gets confused if chat history with different roles is provided. This is
+    # probably not the case with more powerful models
     return [
-        {"content": system_prompt, "role": "system"},
-        {"content": payload, "role": "user"}
+        {"content": system_prompt + '\n\n' + payload, "role": "assistant"},
     ]
+    # return [
+    #     {"content": system_prompt, "role": "assistant"},
+    #     {"content": payload, "role": "user"}
+    # ]
