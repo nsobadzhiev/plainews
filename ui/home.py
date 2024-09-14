@@ -33,6 +33,7 @@ class HomeScreen(Screen[None]):
         ("o", "open_in_browser", "Open in browser"),
         ("t", "translate_article", "Translate"),
         ("s", "summarize_article", "Summarize"),
+        ("r", "refresh_feeds", "Refresh"),
     ]
 
     config = Config()
@@ -66,9 +67,7 @@ class HomeScreen(Screen[None]):
         if isinstance(option.option_list, FeedsList):
             selected_index = option.option_index
             self.selected_feed = self.feed_manager.get_feeds()[selected_index]
-            articles_list = self.query_one(ArticlesList)
-            articles_list.clear_options()
-            articles_list.add_options(self._options_for_feed(self.selected_feed))
+            await self.refresh_selected_feed()
         if isinstance(option.option_list, ArticlesList):
             feed_entry = self.selected_feed.entries[option.option_index]
             self.selected_article = extract_article(feed_entry.link)
@@ -87,6 +86,10 @@ class HomeScreen(Screen[None]):
         if self.selected_article:
             self.notify("Summarizing. Please wait...")
             self._summarize_article()
+
+    async def action_refresh_feeds(self):
+        self.selected_feed = self.feed_manager.refresh_feed(self.selected_feed)
+        await self.refresh_selected_feed()
 
     @work(exclusive=True, exit_on_error=False)
     async def _translate_article(self):
@@ -117,6 +120,11 @@ class HomeScreen(Screen[None]):
         screen.title = article.title
         screen.text = article.text
         screen.update_text()
+
+    async def refresh_selected_feed(self):
+        articles_list = self.query_one(ArticlesList)
+        articles_list.clear_options()
+        articles_list.add_options(self._options_for_feed(self.selected_feed))
 
     @staticmethod
     def _options_for_feed(feed: Feed) -> list[Option | Separator]:

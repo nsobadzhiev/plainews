@@ -27,6 +27,14 @@ class StoredFeeds:
         self.feeds = []
         self.save_feeds()
 
+    def replace_feed(self, old_feed: Feed, new_feed: Feed):
+        """
+        As opposed to removing and adding a feed, this method keeps the
+        order in the feed list
+        """
+        self.feeds = [feed if feed.url != old_feed.url else new_feed for feed in self.feeds]
+        self.save_feeds()
+
     def save_feeds(self):
         with open(self.config.feeds_file, 'wb') as storage_file:
             pickle.dump(self.feeds, storage_file)

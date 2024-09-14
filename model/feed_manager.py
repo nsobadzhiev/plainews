@@ -17,8 +17,7 @@ class FeedManager:
     config = Config()
 
     def __init__(self):
-        feeds = list(map(lambda feed_url: parse_rss_feed(feed_url), self.config.followed_feeds))
-        self.storage.set_feeds(feeds)
+        self.refresh_feeds()
 
     def add_feed(self, feed_url: str) -> Feed:
         feed = parse_rss_feed(feed_url)
@@ -30,6 +29,11 @@ class FeedManager:
         self._replace_feed(feed, new_feed)
         return new_feed
 
+    def refresh_feeds(self) -> list[Feed]:
+        feeds = list(map(lambda feed_url: parse_rss_feed(feed_url), self.config.followed_feeds))
+        self.storage.set_feeds(feeds)
+        return feeds
+
     def get_feeds(self) -> list[Feed]:
         return self.storage.feeds
 
@@ -38,7 +42,5 @@ class FeedManager:
         self.storage.save_feeds()
 
     def _replace_feed(self, old_feed: Feed, new_feed: Feed):
-        self.storage.remove_feed(old_feed)
-        self.storage.add_feed(new_feed)
-        self.storage.save_feeds()
+        self.storage.replace_feed(old_feed, new_feed)
 
