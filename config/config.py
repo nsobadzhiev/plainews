@@ -3,7 +3,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict, PydanticBaseSett
 
 class Config(BaseSettings):
     llm_model: str = "ollama/llama3.1"
-    llm_base_url: str | None = "http://localhost:11434"     # for Ollama
+    llm_base_url: str | None = None   # "http://localhost:11434" for Ollama
+    llm_api_key: str | None = ""
     language: str = "english"
     feeds_file: str = '../feeds.pickle'
     articles_file: str = 'articles.pickle'
