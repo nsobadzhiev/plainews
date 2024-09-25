@@ -1,5 +1,10 @@
+from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict, PydanticBaseSettingsSource, YamlConfigSettingsSource
 
+
+class HistoryConfig(BaseModel):
+    keep_history: bool | None = False
+    max_history_items_per_feed: int | None = 150
 
 class Config(BaseSettings):
     llm_model: str = "ollama/llama3.1"
@@ -14,6 +19,7 @@ class Config(BaseSettings):
         "https://feeds.arstechnica.com/arstechnica/index",
     ]
     summarization_target_length: int | None = 250
+    history: HistoryConfig = HistoryConfig()
 
     # There are two options - reading the config from a file in the PWD, or reading
     # a file from the home directory

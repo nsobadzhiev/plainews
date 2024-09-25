@@ -10,3 +10,5 @@ followed_feeds:
     - https://feeds.arstechnica.com/arstechnica/index
     - https://www.faz.net/rss/aktuell
     - https://world.hey.com/dhh/feed.atom
+history:
+    keep_history: true

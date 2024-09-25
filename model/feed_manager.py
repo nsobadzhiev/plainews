@@ -31,7 +31,13 @@ class FeedManager:
 
     def refresh_feeds(self) -> list[Feed]:
         feeds = list(map(lambda feed_url: parse_rss_feed(feed_url), self.config.followed_feeds))
-        self.storage.set_feeds(feeds)
+        if self.config.history.keep_history:
+            self.storage.load_feeds()
+            [self.storage.merge_feed(feed) for feed in feeds]
+            return self.get_feeds()
+        else:
+            self.storage.set_feeds(feeds)
+
         return feeds
 
     def get_feeds(self) -> list[Feed]:
