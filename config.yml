@@ -12,3 +12,5 @@ followed_feeds:
     - https://world.hey.com/dhh/feed.atom
 history:
     keep_history: true
+tts:
+    cmd: say "<text>"

@@ -11,6 +11,7 @@ from textual.widgets.option_list import Option
 from textual.widgets.option_list import Separator
 from textual.worker import Worker, WorkerState
 
+from ai.tts import speak_text, TextToSpeech, has_tts_setup
 from article_extraction import extract_article
 from config.config import Config
 from model.article import Article
@@ -33,7 +34,10 @@ class HomeScreen(Screen[None]):
         ("o", "open_in_browser", "Open in browser"),
         ("t", "translate_article", "Translate"),
         ("s", "summarize_article", "Summarize"),
+        ("a", "speak_article", "Audio"),
         ("r", "refresh_feeds", "Refresh"),
+        ("p", "pause", "Pause"),
+        ("c", "resume", "Resume"),
     ]
 
     config = Config()
@@ -49,6 +53,7 @@ class HomeScreen(Screen[None]):
         self.plainews = cast("Plainews", self.app)
         self.selected_feed: Feed | None = None
         self.selected_article: Article | None = None
+        self.tts: TextToSpeech | None = None
 
     def on_mount(self) -> None:
         pass
@@ -90,6 +95,41 @@ class HomeScreen(Screen[None]):
     async def action_refresh_feeds(self):
         self.selected_feed = self.feed_manager.refresh_feed(self.selected_feed)
         await self.refresh_selected_feed()
+
+    async def action_speak_article(self):
+        if self.tts and self.tts.is_playing():
+            self.tts.cancel()
+        else:
+            if self.selected_article:
+                self.tts = speak_text(self.selected_article.text)
+        self.refresh_bindings()
+
+    async def action_pause(self):
+        if self.tts:
+            self.tts.pause()
+            self.refresh_bindings()
+
+    async def action_resume(self):
+        if self.tts:
+            self.tts.resume()
+            self.refresh_bindings()
+
+    def check_action(
+            self, action: str, parameters: tuple[object, ...]
+    ) -> bool | None:
+        actions_while_tts = ['pause']
+        actions_while_reading = list(
+            map(lambda m: m[1],
+                filter(lambda b: b[1] not in actions_while_tts, self.BINDINGS))
+        )
+        if action == 'resume':
+            return self.tts is not None and self.tts.is_paused()
+        if action == 'speak_article':
+            return has_tts_setup()
+        if self.tts and self.tts.is_playing():
+            return action in actions_while_reading + actions_while_tts
+        else:
+            return action in actions_while_reading
 
     @work(exclusive=True, exit_on_error=False)
     async def _translate_article(self):

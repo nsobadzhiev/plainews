@@ -6,6 +6,11 @@ class HistoryConfig(BaseModel):
     keep_history: bool | None = False
     max_history_items_per_feed: int | None = 150
 
+
+class TextToSpeechConfig(BaseModel):
+    cmd: str | None = None
+
+
 class Config(BaseSettings):
     llm_model: str = "ollama/llama3.1"
     llm_base_url: str | None = None   # "http://localhost:11434" for Ollama
@@ -20,6 +25,7 @@ class Config(BaseSettings):
     ]
     summarization_target_length: int | None = 250
     history: HistoryConfig = HistoryConfig()
+    tts: TextToSpeechConfig | None = None
 
     # There are two options - reading the config from a file in the PWD, or reading
     # a file from the home directory
