@@ -135,12 +135,14 @@ class HomeScreen(Screen[None]):
     async def _translate_article(self):
         translator = ArticleTranslator(self.config.language)
         version = await self.feed_manager.create_article_version(self.selected_entry, translator)
+        self.selected_article = version.article
         self.update_article_screen(version.article)
 
     @work(exclusive=True, exit_on_error=False)
     async def _summarize_article(self):
         summarizer = ArticleSummary(self.config.summarization_target_length)
         version = await self.feed_manager.create_article_version(self.selected_entry, summarizer)
+        self.selected_article = version.article
         self.update_article_screen(version.article)
 
     async def on_worker_state_changed(self, event: Worker.StateChanged) -> None:
