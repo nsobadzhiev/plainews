@@ -12,10 +12,9 @@ from textual.widgets.option_list import Separator
 from textual.worker import Worker, WorkerState
 
 from ai.tts import speak_text, TextToSpeech, has_tts_setup
-from article_extraction import extract_article
 from config.config import Config
 from model.article import Article
-from model.feed import Feed
+from model.feed import Feed, FeedEntry
 from model.feed_manager import FeedManager
 from transform.article_summary import ArticleSummary
 from transform.article_translator import ArticleTranslator
@@ -52,6 +51,7 @@ class HomeScreen(Screen[None]):
         super().__init__(name, id, classes)
         self.plainews = cast("Plainews", self.app)
         self.selected_feed: Feed | None = None
+        self.selected_entry: FeedEntry | None = None
         self.selected_article: Article | None = None
         self.tts: TextToSpeech | None = None
 
@@ -74,21 +74,21 @@ class HomeScreen(Screen[None]):
             self.selected_feed = self.feed_manager.get_feeds()[selected_index]
             await self.refresh_selected_feed()
         if isinstance(option.option_list, ArticlesList):
-            feed_entry = self.selected_feed.entries[option.option_index]
-            self.selected_article = extract_article(feed_entry.link)
+            self.selected_entry = self.selected_feed.entries[option.option_index]
+            self.selected_article = self.feed_manager.extract_article(self.selected_entry)
             self.update_article_screen(self.selected_article)
 
     def action_open_in_browser(self):
-        if self.selected_article:
-            webbrowser.open(self.selected_article.url)
+        if self.selected_entry:
+            webbrowser.open(self.selected_entry.link)
 
     async def action_translate_article(self):
-        if self.selected_article:
+        if self.selected_entry:
             self.notify("Translating article. Please wait...")
             self._translate_article()
 
     async def action_summarize_article(self):
-        if self.selected_article:
+        if self.selected_entry:
             self.notify("Summarizing. Please wait...")
             self._summarize_article()
 
@@ -134,14 +134,14 @@ class HomeScreen(Screen[None]):
     @work(exclusive=True, exit_on_error=False)
     async def _translate_article(self):
         translator = ArticleTranslator(self.config.language)
-        self.selected_article = await translator.transformed_article(self.selected_article)
-        self.update_article_screen(self.selected_article)
+        version = await self.feed_manager.create_article_version(self.selected_entry, translator)
+        self.update_article_screen(version.article)
 
     @work(exclusive=True, exit_on_error=False)
     async def _summarize_article(self):
         summarizer = ArticleSummary(self.config.summarization_target_length)
-        self.selected_article = await summarizer.transformed_article(self.selected_article)
-        self.update_article_screen(self.selected_article)
+        version = await self.feed_manager.create_article_version(self.selected_entry, summarizer)
+        self.update_article_screen(version.article)
 
     async def on_worker_state_changed(self, event: Worker.StateChanged) -> None:
         """Called when the worker state changes."""
