@@ -18,6 +18,7 @@ from model.feed import Feed, FeedEntry
 from model.feed_manager import FeedManager
 from transform.article_summary import ArticleSummary
 from transform.article_translator import ArticleTranslator
+from rich.text import Text
 from ui.article_screen import ArticleScreen
 from ui.articles_list import ArticlesList
 from ui.feeds_list import FeedsList
@@ -76,7 +77,10 @@ class HomeScreen(Screen[None]):
         if isinstance(option.option_list, ArticlesList):
             self.selected_entry = self.selected_feed.entries[option.option_index]
             self.selected_article = self.feed_manager.extract_article(self.selected_entry)
+            self.selected_entry.meta.is_read = True
             self.update_article_screen(self.selected_article)
+            self.feed_manager.save_feeds()
+            await self.refresh_selected_feed()
 
     def action_open_in_browser(self):
         if self.selected_entry:
@@ -167,6 +171,7 @@ class HomeScreen(Screen[None]):
         articles_list = self.query_one(ArticlesList)
         articles_list.clear_options()
         articles_list.add_options(self._options_for_feed(self.selected_feed))
+        self._restore_selection()
 
     @staticmethod
     def _options_for_feed(feed: Feed) -> list[Option | Separator]:
@@ -177,9 +182,18 @@ class HomeScreen(Screen[None]):
         """
         options = []
         for entry in feed.entries:
-            options.append(entry.title)
+            style = 'italic' if hasattr(entry, 'meta') and entry.meta.is_read else 'bold'
+            options.append(Text(entry.title, style=style))
             options.append(Separator())
         return options
+
+    def _restore_selection(self):
+        try:
+            index = self.selected_feed.entries.index(self.selected_entry)
+            article_list: ArticlesList = cast(ArticlesList, self.query_one(ArticleScreen))
+            article_list.highlighted = index
+        except ValueError:
+            pass
 
     @staticmethod
     def _error_title_for_worker(worker: Worker) -> str | None:
