@@ -17,7 +17,7 @@ class Config(BaseSettings):
     llm_api_key: str | None = ""
     language: str = "english"
     feeds_file: str = '../feeds.pickle'
-    articles_file: str = 'articles.pickle'
+    session_file: str = 'session.pickle'
     transformers: list[str] = []
     followed_feeds: list[str] = [
         "https://rss.sueddeutsche.de/rss/Topthemen",

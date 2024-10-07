@@ -1,5 +1,6 @@
 import logging
 import webbrowser
+from datetime import datetime
 from typing import cast
 
 from textual import on
@@ -16,6 +17,7 @@ from config.config import Config
 from model.article import Article
 from model.feed import Feed, FeedEntry
 from model.feed_manager import FeedManager
+from model.session_manager import SessionManager
 from transform.article_summary import ArticleSummary
 from transform.article_translator import ArticleTranslator
 from rich.text import Text
@@ -42,6 +44,7 @@ class HomeScreen(Screen[None]):
 
     config = Config()
     feed_manager = FeedManager()
+    session_manager = SessionManager()
 
     def __init__(
         self,
@@ -55,9 +58,13 @@ class HomeScreen(Screen[None]):
         self.selected_entry: FeedEntry | None = None
         self.selected_article: Article | None = None
         self.tts: TextToSpeech | None = None
+        session = self.session_manager.session
+        self.last_feed_update = session.last_opened
 
     def on_mount(self) -> None:
-        pass
+        session = self.session_manager.session
+        session.last_opened = datetime.now()
+        self.session_manager.save_session(session)
 
     def compose(self) -> ComposeResult:
         feeds = self.feed_manager.get_feeds()
@@ -210,29 +217,6 @@ class HomeScreen(Screen[None]):
     #     articles_list = stored.feeds[0].articles if len(stored.feeds) > 0 else []
     #     await articles_list.reload_and_refresh()
 
-    # @on(ChatList.ChatOpened)
-    # async def open_chat_screen(self, event: ChatList.ChatOpened):
-    #     chat_id = event.chat.id
-    #     assert chat_id is not None
-    #     chat = await self.chats_manager.get_chat(chat_id)
-    #     await self.app.push_screen(ChatScreen(chat))
-
-    # @on(ChatList.CursorEscapingTop)
-    # def cursor_escaping_top(self):
-    #     self.query_one(HomePromptInput).focus()
-
-    # @on(PromptInput.PromptSubmitted)
-    # async def create_new_chat(self, event: PromptInput.PromptSubmitted) -> None:
-    #     text = event.text
-    #     await self.elia.launch_chat(  # type: ignore
-    #         prompt=text,
-    #         model=self.elia.runtime_config.selected_model,
-    #     )
-
-    # @on(PromptInput.CursorEscapingBottom)
-    # async def move_focus_below(self) -> None:
-    #     self.focus_next(ChatList)
-    #
     # async def action_options(self) -> None:
     #     await self.app.push_screen(
     #         OptionsModal(),
