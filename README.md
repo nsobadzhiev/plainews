@@ -1,6 +1,8 @@
 # Plainews
 ## Distraction and clutter-free publication reading
 
+![Plainews screenshot](images/plainews_screenshot.jpg)
+
 Reading news nowadays is broken. We are bombarded with ads to the point where the useful information we actually want to read is hidden away along a sea of upsells, ads and clickbait.
 
 Plainews takes all that nonsense away and lets you focus on what you actually __want to__ read.
