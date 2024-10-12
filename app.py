@@ -9,6 +9,10 @@ class Plainews(App[None]):
         await self.push_screen(HomeScreen())
 
 
-if __name__ == '__main__':
+def run_app():
     app = Plainews()
     app.run()
+
+
+if __name__ == '__main__':
+    run_app()

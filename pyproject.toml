@@ -14,11 +14,14 @@ feedparser = "^6.0.11"
 rich = "^13.8.0"
 litellm = "^1.44.24"
 pydantic-settings = "^2.5.2"
-textual = "^0.81.0"
+textual = "^0.83.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^8.3.3"
 textual-dev = "^1.6.0"
+
+[tool.poetry.scripts]
+demo-cli = "app:run_app"
 
 [build-system]
 requires = ["poetry-core"]
