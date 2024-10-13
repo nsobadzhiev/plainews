@@ -5,6 +5,16 @@ description = "Distraction and clutter free reading"
 authors = ["Nikola <nikola@kumulintelligence.com>"]
 readme = "README.md"
 
+packages = [
+    { include = "plainews", from = "." },
+    { include = "ui", from = "." },
+    { include = "config", from = "." },
+    { include = "ai", from = "." },
+    { include = "model", from = "." },
+    { include = "transform", from = "." },
+    { include = "storage", from = "." },
+]
+
 [tool.poetry.dependencies]
 python = "^3.12"
 newspaper3k = "^0.2.8"
@@ -21,7 +31,7 @@ pytest = "^8.3.3"
 textual-dev = "^1.6.0"
 
 [tool.poetry.scripts]
-demo-cli = "app:run_app"
+plainews = "plainews.app:run_app"
 
 [build-system]
 requires = ["poetry-core"]
@@ -45,6 +55,3 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: Unix",
 ]
-
-[project.scripts]
-app_name = "app"

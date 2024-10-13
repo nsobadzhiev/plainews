@@ -3,8 +3,8 @@ from model.article import Article
 from model.article_version import ArticleVersion
 from model.feed import Feed, FeedEntry
 from storage.stored_feeds import StoredFeeds
-from feed_parser import parse_rss_feed
-from article_extraction import extract_article
+from model.feed_parser import parse_rss_feed
+from model.article_extraction import extract_article
 from transform.article_transformer import ArticleTransformer
 
 

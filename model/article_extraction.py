@@ -3,7 +3,6 @@ import sys
 
 from newspaper import Article as NewspaperArticle
 
-from article_presentation import present_article
 from model.article import Article
 
 logger = logging.getLogger(__name__)
@@ -40,4 +39,3 @@ if __name__ == "__main__":
     result = extract_article(url)
     logger.info(result)
     logger.info(result.keywords)
-    present_article(result)
