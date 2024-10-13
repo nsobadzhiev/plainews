@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "plainews"
-version = "0.2.0"
+version = "0.3.0"
 description = "Distraction and clutter free reading"
 authors = ["Nikola <nikola@kumulintelligence.com>"]
 readme = "README.md"
