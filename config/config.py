@@ -1,3 +1,5 @@
+import os
+
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict, PydanticBaseSettingsSource, YamlConfigSettingsSource
 
@@ -29,7 +31,7 @@ class Config(BaseSettings):
 
     # There are two options - reading the config from a file in the PWD, or reading
     # a file from the home directory
-    model_config = SettingsConfigDict(yaml_file=['~/.plainews.yml', 'config.yml'])
+    model_config = SettingsConfigDict(yaml_file=[os.path.expanduser('~/.plainews.yml'), 'config.yml'])
 
     @classmethod
     def settings_customise_sources(
