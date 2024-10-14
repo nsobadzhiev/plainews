@@ -1,6 +1,8 @@
 # Plainews
 ## Distraction and clutter-free publication reading
 
+[![PyPI version](https://badge.fury.io/py/plainews.svg)](https://badge.fury.io/py/plainews)
+
 ![Plainews screenshot](images/plainews_screenshot.jpg)
 
 Reading news nowadays is broken. We are bombarded with ads to the point where the useful information we actually want to read is hidden away along a sea of upsells, ads and clickbait.
