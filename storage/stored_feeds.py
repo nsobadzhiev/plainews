@@ -2,6 +2,7 @@ import os
 import pickle
 from config.config import Config
 from model.feed import Feed
+from storage.config_dir import create_config_dir
 
 
 class StoredFeeds:
@@ -59,8 +60,13 @@ class StoredFeeds:
         self.save_feeds()
 
     def save_feeds(self):
-        with open(self.config.feeds_file, 'wb') as storage_file:
-            pickle.dump(self.feeds, storage_file)
+        try:
+            with open(self.config.feeds_file, 'wb') as storage_file:
+                pickle.dump(self.feeds, storage_file)
+        except FileNotFoundError:
+            if create_config_dir():
+                # retry (caution - it's recursing)
+                self.save_feeds()
 
     def load_feeds(self):
         if os.path.exists(self.config.feeds_file):

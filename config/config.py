@@ -3,6 +3,7 @@ import os
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict, PydanticBaseSettingsSource, YamlConfigSettingsSource
 
+APP_CONFIG_DIR = '~/.plainews'
 
 class HistoryConfig(BaseModel):
     keep_history: bool | None = False
@@ -18,8 +19,8 @@ class Config(BaseSettings):
     llm_base_url: str | None = None   # "http://localhost:11434" for Ollama
     llm_api_key: str | None = ""
     language: str = "english"
-    feeds_file: str = '../feeds.pickle'
-    session_file: str = 'session.pickle'
+    feeds_file: str = os.path.expanduser(f'{APP_CONFIG_DIR}/feeds.pickle')
+    session_file: str = os.path.expanduser(f'{APP_CONFIG_DIR}/session.pickle')
     transformers: list[str] = []
     followed_feeds: list[str] = [
         "https://rss.sueddeutsche.de/rss/Topthemen",
@@ -31,7 +32,13 @@ class Config(BaseSettings):
 
     # There are two options - reading the config from a file in the PWD, or reading
     # a file from the home directory
-    model_config = SettingsConfigDict(yaml_file=[os.path.expanduser('~/.plainews.yml'), 'config.yml'])
+    model_config = SettingsConfigDict(
+        yaml_file=[
+            os.path.expanduser('~/.plainews.yml'),
+            os.path.expanduser(f'{APP_CONFIG_DIR}/config.yml'),
+            'config.yml'
+        ]
+    )
 
     @classmethod
     def settings_customise_sources(
