@@ -10,13 +10,19 @@ logger = logging.getLogger(__name__)
 def extract_article(article_url: str) -> Article:
     article = NewspaperArticle(article_url)
     article.download()
-    article.parse()
-    article.nlp()
-    logger.info(f'Downloaded article: {article.title}')
-    return _parse_article(article_url, article)
+    try:
+        return _parse_article(article_url, article)
+    except LookupError:
+        # Newspaper needs some tokenizers from nltk.
+        # Download them and try again
+        import nltk
+        nltk.download('punkt_tab')
+        return _parse_article(article_url, article)
 
 
 def _parse_article(article_url: str, news_article: NewspaperArticle) -> Article:
+    news_article.parse()
+    news_article.nlp()
     return Article(
         title=news_article.title,
         text=news_article.text,
