@@ -3,6 +3,8 @@
 
 [![PyPI version](https://badge.fury.io/py/plainews.svg)](https://badge.fury.io/py/plainews)
 
+Check out our [Official website](https://nsobadzhiev.github.io/plainews-website/) :)
+
 ![Plainews screenshot](images/plainews_screenshot.jpg)
 
 Reading news nowadays is broken. We are bombarded with ads to the point where the useful information we actually want to read is hidden away alongside a sea of upsells, ads and clickbait.
