@@ -1,0 +1,40 @@
+Screen {
+    align: center middle;
+}
+
+LatestArticlesView {
+    width: 80%;
+    height: 90%;
+    border: heavy white;
+
+    align: center middle;
+}
+
+#latest_articles_title {
+    text-align: center;
+    text-align: center;
+    width: 100%;
+    text-style: bold;
+}
+
+#latest_articles_list {
+    align: center middle;
+    width: 100%;
+    height: 500;
+}
+
+#latest_articles_grid {
+    grid_size: 1;
+    grid_gutter: 1 0;
+    grid_rows: 1fr 10fr 3fr;
+    grid_columns: 1fr;
+    align: center middle;
+}
+
+#summary_button {
+    width: 100%;
+}
+
+#open_button {
+    width: 100%;
+}

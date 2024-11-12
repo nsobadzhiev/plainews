@@ -9,3 +9,8 @@ class Session(BaseModel):
     state variables that the application generates and stores.
     """
     last_opened: datetime | None = None
+
+    """
+    Last time feeds were refreshed (successfully)
+    """
+    last_feed_refresh: datetime | None = None

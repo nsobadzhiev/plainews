@@ -1,7 +1,10 @@
+from datetime import datetime, timedelta
+
 from config.config import Config
 from model.article import Article
 from model.article_version import ArticleVersion
 from model.feed import Feed, FeedEntry
+from model.session_manager import SessionManager
 from storage.stored_feeds import StoredFeeds
 from model.feed_parser import parse_rss_feed
 from model.article_extraction import extract_article
@@ -15,8 +18,11 @@ def _article_from_feed_entry(feed_entry: FeedEntry) -> Article:
 
 class FeedManager:
 
+    REFRESH_INTERVAL_SECS = 120
+
     storage = StoredFeeds([])
     config = Config()
+    session_manager = SessionManager()
 
     def __init__(self):
         self.refresh_feeds()
@@ -39,6 +45,7 @@ class FeedManager:
             return self.get_feeds()
         else:
             self.storage.set_feeds(feeds)
+        self.session_manager.update_last_feed_refresh(datetime.now())
         return feeds
 
     def get_feeds(self) -> list[Feed]:
@@ -71,6 +78,17 @@ class FeedManager:
         self.save_feeds()
         return transformed
 
+    def outdated_feeds(self) -> bool:
+        """
+        Checks if the feeds need to be refreshed
+        :return: True, if feeds are older than REFRESH_INTERVAL_SECS. False, otherwise
+        """
+        last_refresh = self.session_manager.session.last_feed_refresh if (
+            self.session_manager.session.last_feed_refresh) \
+            else datetime.min
+        if not self.session_manager.session.last_feed_refresh:
+            return True
+        return last_refresh + timedelta(seconds=self.REFRESH_INTERVAL_SECS) < datetime.now()
+
     def _replace_feed(self, old_feed: Feed, new_feed: Feed):
         self.storage.replace_feed(old_feed, new_feed)
-

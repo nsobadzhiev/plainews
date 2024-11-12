@@ -7,7 +7,7 @@ from textual import on
 from textual import work
 from textual.app import ComposeResult
 from textual.widget import Widget
-from textual.widgets import Header, Footer
+from textual.widgets import Header, Footer, OptionList
 from textual.widgets.option_list import Option
 from textual.widgets.option_list import Separator
 from textual.worker import Worker, WorkerState
@@ -21,7 +21,7 @@ from model.session_manager import SessionManager
 from transform.article_summary import ArticleSummary
 from transform.article_translator import ArticleTranslator
 from rich.text import Text
-from ui.article_screen import ArticleScreen
+from ui.article_view import ArticleView
 from ui.articles_list import ArticlesList
 from ui.feeds_list import FeedsList
 
@@ -74,14 +74,14 @@ class ReaderView(Widget):
         feeds = self.feed_manager.get_feeds()
         feed_titles = list(map(lambda f: f.title, feeds))
         yield Header()
-        yield FeedsList(*feed_titles, id='sidebar-feeds', classes='sidebar-expanded')
+        yield FeedsList(feed_items=feed_titles, id='sidebar-feeds', classes='sidebar-expanded')
         yield ArticlesList(*[], id='sidebar-articles', classes='sidebar-collapsed')
-        yield ArticleScreen("")
+        yield ArticleView("")
         yield Footer()
 
-    @on(FeedsList.OptionSelected)
-    async def feed_selected(self, option: FeedsList.OptionSelected):
-        if isinstance(option.option_list, FeedsList):
+    @on(OptionList.OptionSelected)
+    async def feed_selected(self, option: OptionList.OptionSelected):
+        if option.option_list is self.feeds_option_list:
             selected_index = option.option_index
             self.selected_feed = self.feed_manager.get_feeds()[selected_index]
             await self.refresh_selected_feed()
@@ -169,8 +169,8 @@ class ReaderView(Widget):
                 severity="error")
             self.log(event)
 
-    def _article_screen(self) -> ArticleScreen | None:
-        return self.query_one(ArticleScreen)
+    def _article_screen(self) -> ArticleView | None:
+        return self.query_one(ArticleView)
 
     def update_article_screen(self, article: Article):
         screen = self._article_screen()
@@ -183,6 +183,10 @@ class ReaderView(Widget):
         articles_list.clear_options()
         articles_list.add_options(self._options_for_feed(self.selected_feed))
         self._restore_selection()
+
+    @property
+    def feeds_option_list(self) -> OptionList:
+        return self.query_exactly_one(selector=f'#{FeedsList.OPTIONS_LIST_ID}', expect_type=OptionList)
 
     @staticmethod
     def _options_for_feed(feed: Feed) -> list[Option | Separator]:
@@ -201,7 +205,7 @@ class ReaderView(Widget):
     def _restore_selection(self):
         try:
             index = self.selected_feed.entries.index(self.selected_entry)
-            article_list: ArticlesList = cast(ArticlesList, self.query_one(ArticleScreen))
+            article_list: ArticlesList = cast(ArticlesList, self.query_one(ArticleView))
             article_list.highlighted = index
         except ValueError:
             pass

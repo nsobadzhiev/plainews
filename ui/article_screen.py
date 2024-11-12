@@ -1,26 +1,27 @@
 from textual.app import ComposeResult
-from textual.reactive import reactive
-from textual.widget import Widget
-from textual.widgets import TextArea, Static
+from textual.screen import Screen
+from textual.events import Key
+
+from model.article import Article
+from ui.article_view import ArticleView
 
 
-class ArticleScreen(Widget):
+class ArticleScreen(Screen):
 
-    title = reactive("No article selected")
-    text = reactive('Select an item on the left')
-
-    def __init__(self, text: str, id: str | None = None):
-        super().__init__(id=id)
-        self.text = text
-
-    def update_text(self):
-        title = self.query_one(Static)
-        title.update(self.title)
-        body = self.query_one(TextArea)
-        body.text = self.text
+    def __init__(
+            self,
+            article: Article,
+            name: str | None = None,
+            id: str | None = None,
+            classes: str | None = None,
+    ):
+        super().__init__(name, id, classes)
+        self.article = article
 
     def compose(self) -> ComposeResult:
-        yield Static(self.title, id='article-title')
-        area = TextArea(self.text, id='article-text')
-        area.read_only = True
-        yield area
+        article_view = ArticleView(self.article.text, self.article.title)
+        yield article_view
+
+    def on_key(self, event: Key) -> None:
+        if event.key == 'q' or event.key == 'escape':
+            self.app.pop_screen()
