@@ -1,4 +1,5 @@
 import datetime
+from typing import cast
 
 from textual import events, work
 from textual import on
@@ -12,6 +13,7 @@ from textual.worker import Worker, WorkerState
 
 from model.article import Article
 from model.feed import FeedEntry
+from model.feed_manager import FeedManager
 from model.latest_articles import articles_since, articles_summary
 from storage.stored_session import StoredSession
 from ui.article_screen import ArticleScreen
@@ -23,6 +25,7 @@ class LatestArticlesView(Widget):
         pass
 
     session = StoredSession()
+    feed_manager = FeedManager()
 
     def __init__(self,
                  *children: Widget,
@@ -62,6 +65,15 @@ class LatestArticlesView(Widget):
     @on(Button.Pressed, '#summary_button')
     async def on_create_summary(self):
         self.create_summary()
+
+    @on(Button.Pressed, '#open_button')
+    async def on_open_article(self):
+        selected_item_index = self.latest_articles_list.highlighted
+        if selected_item_index:
+            feed_entry: FeedEntry = self.current_items[cast(int, selected_item_index)]
+            article = feed_entry.meta.base_article if feed_entry.meta.base_article \
+                else self.feed_manager.extract_article(feed_entry)
+            await self.app.push_screen(ArticleScreen(article))
 
     @work(exclusive=True, exit_on_error=False)
     async def create_summary(self) -> Article:
