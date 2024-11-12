@@ -76,7 +76,7 @@ class ReaderView(Widget):
         yield Header()
         yield FeedsList(feed_items=feed_titles, id='sidebar-feeds', classes='sidebar-expanded')
         yield ArticlesList(*[], id='sidebar-articles', classes='sidebar-collapsed')
-        yield ArticleView("")
+        yield ArticleView("", "")
         yield Footer()
 
     @on(OptionList.OptionSelected)

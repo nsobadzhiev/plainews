@@ -22,11 +22,11 @@ async def latest_articles_summary(since_date: datetime, force_fetch: bool) -> Ar
     return await articles_summary(entries)
 
 
-async def articles_summary(entries: list[FeedEntry]) -> Article:
+async def articles_summary(entries: list[FeedEntry], delimiter: str = '\n\n-------------\n\n') -> Article:
     pipeline = _latest_articles_pipeline(entries)
     articles = await pipeline.transform()
     article_texts = [article.text for article in articles]
-    summary = '-------------'.join(article_texts)
+    summary = delimiter.join(article_texts)
     return Article(
         title=f"Summary of the selected articles",
         text=summary,
