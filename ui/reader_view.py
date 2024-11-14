@@ -33,13 +33,7 @@ class ReaderView(Widget):
     CSS_PATH = ['reader_view.tcss', 'article_layout.tcss']
 
     BINDINGS = [
-        ("o", "open_in_browser", "Open in browser"),
-        ("t", "translate_article", "Translate"),
-        ("s", "summarize_article", "Summarize"),
-        ("a", "speak_article", "Audio"),
         ("r", "refresh_feeds", "Refresh"),
-        ("p", "pause", "Pause"),
-        ("c", "resume", "Resume"),
     ]
 
     config = Config()
@@ -76,7 +70,7 @@ class ReaderView(Widget):
         yield Header()
         yield FeedsList(feed_items=feed_titles, id='sidebar-feeds', classes='sidebar-expanded')
         yield ArticlesList(*[], id='sidebar-articles', classes='sidebar-collapsed')
-        yield ArticleView("", "")
+        yield ArticleView()
         yield Footer()
 
     @on(OptionList.OptionSelected)
@@ -174,6 +168,8 @@ class ReaderView(Widget):
 
     def update_article_screen(self, article: Article):
         screen = self._article_screen()
+        screen.selected_entry = self.selected_entry
+        screen.selected_article = self.selected_article
         screen.title = article.title
         screen.text = article.text
         screen.update_text()

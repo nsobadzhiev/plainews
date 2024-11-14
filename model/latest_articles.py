@@ -12,6 +12,7 @@ def articles_since(since_date: datetime, force_fetch: bool) -> list[FeedEntry]:
     feed_manager = FeedManager()
     if force_fetch or feed_manager.outdated_feeds():
         feed_manager.refresh_feeds()
+        feed_manager.session_manager.update_last_feed_refresh(datetime.now())
     feeds = feed_manager.get_feeds()
     entries = functools.reduce(lambda a, b: a + b.entries, feeds, [])
     return list(filter(lambda e: since_date < e.publish_date, entries))

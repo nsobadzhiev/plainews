@@ -48,7 +48,7 @@ class LatestArticlesView(Widget):
 
     def on_mount(self, event: events.Mount) -> None:
         self.current_items = articles_since(
-            self.session.session.last_opened - datetime.timedelta(days=1), force_fetch=True
+            self.session.session.last_opened - datetime.timedelta(days=1), force_fetch=False
         )
         titles = [entry.title for entry in self.current_items]
         self.latest_articles_list.clear_options()
@@ -73,7 +73,7 @@ class LatestArticlesView(Widget):
             feed_entry: FeedEntry = self.current_items[cast(int, selected_item_index)]
             article = feed_entry.meta.base_article if feed_entry.meta.base_article \
                 else self.feed_manager.extract_article(feed_entry)
-            await self.app.push_screen(ArticleScreen(article))
+            await self.app.push_screen(ArticleScreen(feed_entry, article))
 
     @work(exclusive=True, exit_on_error=False)
     async def create_summary(self) -> Article:
@@ -91,7 +91,7 @@ class LatestArticlesView(Widget):
             self.log(event)
         elif event.state == WorkerState.SUCCESS:
             result = event.worker.result
-            self.app.push_screen(ArticleScreen(result))
+            self.app.push_screen(ArticleScreen(article=result))
 
     @staticmethod
     def _selection_list_items(titles: list[str]) -> list[tuple[str, int, bool]]:
