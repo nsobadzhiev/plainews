@@ -59,16 +59,15 @@ class ReaderView(Widget):
         session = self.session_manager.session
         self.last_feed_update = session.last_opened
 
-    def on_mount(self) -> None:
+    async def on_mount(self) -> None:
         session = self.session_manager.session
         session.last_opened = datetime.now()
         self.session_manager.save_session(session)
+        self._refresh_feeds()
 
     def compose(self) -> ComposeResult:
-        feeds = self.feed_manager.get_feeds()
-        feed_titles = list(map(lambda f: f.title, feeds))
         yield Header()
-        yield FeedsList(feed_items=feed_titles, id='sidebar-feeds', classes='sidebar-expanded')
+        yield FeedsList(feed_items=[], id='sidebar-feeds', classes='sidebar-expanded')
         yield ArticlesList(*[], id='sidebar-articles', classes='sidebar-collapsed')
         yield ArticleView()
         yield Footer()
@@ -140,6 +139,10 @@ class ReaderView(Widget):
         else:
             return action in actions_while_reading
 
+    @work(exclusive=True, exit_on_error=False, name='refresh_feeds', thread=True)
+    async def _refresh_feeds(self) -> list[Feed]:
+        return self.feed_manager.refresh_feeds()
+
     @work(exclusive=True, exit_on_error=False)
     async def _translate_article(self):
         translator = ArticleTranslator(self.config.language)
@@ -162,6 +165,11 @@ class ReaderView(Widget):
                 message=f"Error: {str(event.worker.error)[:300]}",
                 severity="error")
             self.log(event)
+        if event.worker.name == 'refresh_feeds' and event.state == WorkerState.SUCCESS:
+            feeds = event.worker.result
+            feeds_titles = [feed.title for feed in feeds]
+            self.feeds_option_list.clear_options()
+            self.feeds_option_list.add_options(feeds_titles)
 
     def _article_screen(self) -> ArticleView | None:
         return self.query_one(ArticleView)

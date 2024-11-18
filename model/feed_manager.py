@@ -24,9 +24,6 @@ class FeedManager:
     config = Config()
     session_manager = SessionManager()
 
-    def __init__(self):
-        self.refresh_feeds()
-
     def add_feed(self, feed_url: str) -> Feed:
         feed = parse_rss_feed(feed_url)
         self.storage.add_feed(feed)

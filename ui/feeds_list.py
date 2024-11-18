@@ -18,16 +18,29 @@ class FeedsList(Widget):
             id: str | None = None,
             classes: str | None = None,
             disabled: bool = False,
-            feed_items: list | None = None,
+            feed_items: list[str] | None = None,
     ):
         super().__init__(*children, name=name, id=id, classes=classes, disabled=disabled)
-        self.feed_items = feed_items
+        self._feed_items = feed_items
 
     def compose(self) -> ComposeResult:
-        yield OptionList(*self.feed_items, id=self.OPTIONS_LIST_ID)
+        yield OptionList(*self._feed_items, id=self.OPTIONS_LIST_ID)
         yield Button('Since you were last here', id='latest_button')
 
     @on(Button.Pressed, selector='#latest_button')
     def on_latest_articles_pressed(self, button: Button):
         articles_screen = LatestArticlesScreen()
         self.app.push_screen(articles_screen)
+
+    @property
+    def feed_items(self) -> list[str]:
+        return self._feed_items
+
+    @feed_items.setter
+    def feed_items(self, new_value: list[str]):
+        self._feed_items = new_value
+        self._options_list().clear_options()
+        self._options_list().add_options(new_value)
+
+    def _options_list(self) -> OptionList:
+        return self.query_exactly_one(selector=f'#{FeedsList.OPTIONS_LIST_ID}', expect_type=OptionList)
