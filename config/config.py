@@ -17,7 +17,9 @@ class TextToSpeechConfig(BaseModel):
 class Config(BaseSettings):
     llm_model: str = "ollama/llama3.1"
     llm_base_url: str | None = None   # "http://localhost:11434" for Ollama
-    llm_api_key: str | None = ""
+    llm_api_key: str | None = None
+    llm_api_type: str | None = None   # needed for Azure OpenAI
+    llm_version: str | None = None    # needed for Azure OpenAI
     language: str = "english"
     feeds_file: str = os.path.expanduser(f'{APP_CONFIG_DIR}/feeds.pickle')
     session_file: str = os.path.expanduser(f'{APP_CONFIG_DIR}/session.pickle')
