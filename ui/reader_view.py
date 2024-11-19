@@ -63,6 +63,8 @@ class ReaderView(Widget):
         session = self.session_manager.session
         session.last_opened = datetime.now()
         self.session_manager.save_session(session)
+        feeds = self.feed_manager.get_feeds()
+        self._update_feeds_list(feeds)
         self._refresh_feeds()
 
     def compose(self) -> ComposeResult:
@@ -167,12 +169,15 @@ class ReaderView(Widget):
             self.log(event)
         if event.worker.name == 'refresh_feeds' and event.state == WorkerState.SUCCESS:
             feeds = event.worker.result
-            feeds_titles = [feed.title for feed in feeds]
-            self.feeds_option_list.clear_options()
-            self.feeds_option_list.add_options(feeds_titles)
+            self._update_feeds_list(feeds)
 
     def _article_screen(self) -> ArticleView | None:
         return self.query_one(ArticleView)
+
+    def _update_feeds_list(self, feeds: list[Feed]):
+        feeds_titles = [feed.title for feed in feeds]
+        self.feeds_option_list.clear_options()
+        self.feeds_option_list.add_options(feeds_titles)
 
     def update_article_screen(self, article: Article):
         screen = self._article_screen()
