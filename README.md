@@ -116,6 +116,21 @@ Plainews has a few smart features provided by a large language model (that you p
 
 Detailed information how these features and setup can be found in the [LLM_SETTINGS.md](LLM_SETTINGS.md) file.
 
+#### Running smart features via Ollama
+
+Ollama is a great way to run an LLM locally and avoid privacy issues, as well as costs associated with proprietary models such as OpenAI's. In order to use Ollama, you need to first install it on your system, download the model you want to use and you need to make sure Ollama is running as a service in the background. On Unix machines, you can so that using:
+
+```commandline
+ollama serve
+```
+
+After that, the Ollama server should be listening on the default port of 11434.
+The next step would be to setup the plainews config to use that server. It's important to set the correct model name and `llm_base_url`. To see this in action, you can check out the example file in `config_examples/ollama_config.yml`. For more information regarding the configuration file, refer to the [LLM_SETTINGS.md](LLM_SETTINGS.md).
+
+#### Using OpenAI
+
+Using OpenAI for smart features is more straight-forward. The only thing to set up is the model to use and your OpenAI API key. Feel free to copy and modify the example file in `config_examples/openai_config.yml`. 
+
 ### Dependencies
 
 Poetry is used for dependency management. Before running, you need to make sure these dependencies are installed, either globally or in a (virtual) environment.

@@ -1,0 +1,8 @@
+llm_model: ollama/llama3.1
+llm_base_url: http://localhost:11434
+language: english
+followed_feeds:
+    - https://feeds.arstechnica.com/arstechnica/index
+    - https://medium.com/feed/@n.sobadjiev_2847
+history:
+    keep_history: true

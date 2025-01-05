@@ -1,0 +1,5 @@
+llm_model: gpt-4o
+llm_api_key: <openai_key>
+language: english
+followed_feeds:
+    - https://feeds.arstechnica.com/arstechnica/index
