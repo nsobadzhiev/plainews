@@ -9,5 +9,3 @@ followed_feeds:
     - https://medium.com/feed/@n.sobadjiev_2847
 history:
     keep_history: true
-tts:
-    cmd: say "<text>"
