@@ -19,16 +19,16 @@ packages = [
 python = "^3.12"
 newspaper3k = "^0.2.8"
 lxml_html_clean = "^0.2.0"
-pydantic = "^2.9.1"
+pydantic = "^2.10.4"
 feedparser = "^6.0.11"
-rich = "^13.8.0"
-litellm = "^1.44.24"
-pydantic-settings = "^2.5.2"
-textual = "^0.85.2"
+rich = "^13.9.4"
+litellm = "^1.56.10"
+pydantic-settings = "^2.7.1"
+textual = "^1.0.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^8.3.3"
-textual-dev = "^1.6.0"
+textual-dev = "^1.7.0"
 
 [tool.poetry.scripts]
 plainews = "plainews.app:run_app"
