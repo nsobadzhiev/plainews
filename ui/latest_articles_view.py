@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta
 from typing import cast
 
 from textual import events, work
@@ -15,7 +15,7 @@ from model.article import Article
 from model.feed import FeedEntry
 from model.feed_manager import FeedManager
 from model.latest_articles import articles_since, articles_summary
-from storage.stored_session import StoredSession
+from model.session_manager import SessionManager
 from ui.article_screen import ArticleScreen
 
 
@@ -24,7 +24,7 @@ class LatestArticlesView(Widget):
     class Escape(Message):
         pass
 
-    session = StoredSession()
+    session_manager = SessionManager()
     feed_manager = FeedManager()
 
     def __init__(self,
@@ -48,7 +48,7 @@ class LatestArticlesView(Widget):
 
     def on_mount(self, event: events.Mount) -> None:
         self.current_items = articles_since(
-            self.session.session.last_opened - datetime.timedelta(days=1), force_fetch=False
+            self._last_opened_time() - timedelta(days=1), force_fetch=False
         )
         titles = [entry.title for entry in self.current_items]
         self.latest_articles_list.clear_options()
@@ -96,3 +96,11 @@ class LatestArticlesView(Widget):
     @staticmethod
     def _selection_list_items(titles: list[str]) -> list[tuple[str, int, bool]]:
         return [(title, index, False) for index, title in enumerate(titles)]
+
+    def _last_opened_time(self) -> datetime:
+        # it's important to NOT return the min date here because then
+        # generating a date that's prior to the min one, throws an exception
+        # Default to ~ year ago
+        return self.session_manager.session.last_opened \
+            if self.session_manager.session.last_feed_refresh \
+            else datetime.now() - timedelta(weeks=54)
