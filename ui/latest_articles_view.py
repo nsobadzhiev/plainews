@@ -46,13 +46,9 @@ class LatestArticlesView(Widget):
             id='latest_articles_grid',
         )
 
-    def on_mount(self, event: events.Mount) -> None:
-        self.current_items = articles_since(
-            self._last_opened_time() - timedelta(days=1), force_fetch=False
-        )
-        titles = [entry.title for entry in self.current_items]
-        self.latest_articles_list.clear_options()
-        self.latest_articles_list.add_options(self._selection_list_items(titles))
+    async def on_mount(self, event: events.Mount) -> None:
+        self.latest_articles_list.loading = True
+        self.load_articles()
 
     def on_key(self, event: Key) -> None:
         if event.key == 'q' or event.key == 'escape':
@@ -75,6 +71,12 @@ class LatestArticlesView(Widget):
                 else self.feed_manager.extract_article(feed_entry)
             await self.app.push_screen(ArticleScreen(feed_entry, article))
 
+    @work(exclusive=True, name="load_articles", exit_on_error=False, thread=True)
+    async def load_articles(self):
+        self.current_items = articles_since(
+            self._last_opened_time() - timedelta(days=1), force_fetch=False
+        )
+
     @work(exclusive=True, exit_on_error=False)
     async def create_summary(self) -> Article:
         selected_item_indexes = self.latest_articles_list.selected
@@ -89,9 +91,13 @@ class LatestArticlesView(Widget):
                 message=f"Error: {str(event.worker.error)[:300]}",
                 severity="error")
             self.log(event)
+            self.latest_articles_list.loading = False
         elif event.state == WorkerState.SUCCESS:
-            result = event.worker.result
-            self.app.push_screen(ArticleScreen(article=result))
+            if event.worker.name == 'create_summary':
+                result = event.worker.result
+                self.app.push_screen(ArticleScreen(article=result))
+            if event.worker.name == 'load_articles':
+                self._update_titles()
 
     @staticmethod
     def _selection_list_items(titles: list[str]) -> list[tuple[str, int, bool]]:
@@ -104,3 +110,9 @@ class LatestArticlesView(Widget):
         return self.session_manager.session.last_opened \
             if self.session_manager.session.last_feed_refresh \
             else datetime.now() - timedelta(weeks=54)
+
+    def _update_titles(self):
+        titles = [entry.title for entry in self.current_items]
+        self.latest_articles_list.clear_options()
+        self.latest_articles_list.add_options(self._selection_list_items(titles))
+        self.latest_articles_list.loading = False
