@@ -122,7 +122,11 @@ class ArticleView(Widget):
         self.text = article.text
         self.update_text()
 
+    def _toggle_loading(self, is_loading: bool):
+        self.query_one(Static).loading = is_loading
+
     async def _apply_transformer(self, transformer: ArticleTransformer):
+        self._toggle_loading(True)
         if self.selected_entry:
             version = await self.feed_manager.create_article_version(self.selected_entry, transformer)
             self.selected_article = version.article
@@ -130,3 +134,4 @@ class ArticleView(Widget):
             new_version = await transformer.transformed_article(self.selected_article)
             self.selected_article = new_version.article
         self._update_view(self.selected_article)
+        self._toggle_loading(False)
