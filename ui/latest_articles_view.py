@@ -58,6 +58,10 @@ class LatestArticlesView(Widget):
     def latest_articles_list(self) -> SelectionList:
         return self.query_exactly_one(SelectionList)
 
+    @property
+    def create_summary_button(self) -> Button:
+        return self.query_exactly_one(selector='#summary_button', expect_type=Button)
+
     @on(Button.Pressed, '#summary_button')
     async def on_create_summary(self):
         self.create_summary()
@@ -79,6 +83,7 @@ class LatestArticlesView(Widget):
 
     @work(exclusive=True, exit_on_error=False)
     async def create_summary(self) -> Article:
+        self.create_summary_button.loading = True
         selected_item_indexes = self.latest_articles_list.selected
         selected_entries = [self.current_items[index] for index in selected_item_indexes]
         return await articles_summary(selected_entries)
@@ -92,10 +97,12 @@ class LatestArticlesView(Widget):
                 severity="error")
             self.log(event)
             self.latest_articles_list.loading = False
+            self.create_summary_button.loading = False
         elif event.state == WorkerState.SUCCESS:
             if event.worker.name == 'create_summary':
                 result = event.worker.result
                 self.app.push_screen(ArticleScreen(article=result))
+                self.create_summary_button.loading = False
             if event.worker.name == 'load_articles':
                 self._update_titles()
 
