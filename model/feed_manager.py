@@ -11,11 +11,6 @@ from model.article_extraction import extract_article
 from transform.article_transformer import ArticleTransformer
 
 
-def _article_from_feed_entry(feed_entry: FeedEntry) -> Article:
-    article = extract_article(feed_entry.link)
-    return article
-
-
 class FeedManager:
 
     REFRESH_INTERVAL_SECS = 120

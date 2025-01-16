@@ -1,5 +1,4 @@
 import logging
-import sys
 
 from newspaper import Article as NewspaperArticle
 
@@ -32,16 +31,3 @@ def _parse_article(article_url: str, news_article: NewspaperArticle) -> Article:
         url=article_url,
         language=news_article.meta_lang,
     )
-
-
-if __name__ == "__main__":
-    logging.basicConfig(
-        format="%(asctime)s - %(levelname)s - %(message)s",
-        style="%",
-        datefmt="%Y-%m-%d %H:%M",
-        level=logging.INFO,
-    )
-    url = sys.argv[1]
-    result = extract_article(url)
-    logger.info(result)
-    logger.info(result.keywords)
