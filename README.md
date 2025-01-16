@@ -75,8 +75,6 @@ Here's the default yaml configuration:
 llm_model: ollama/llama3.1
 llm_base_url: http://localhost:11434
 language: english
-feeds_file: feeds.pickle
-articles_file: articles.pickle
 followed_feeds:
     - https://rss.sueddeutsche.de/rss/Topthemen
     - https://feeds.arstechnica.com/arstechnica/index
