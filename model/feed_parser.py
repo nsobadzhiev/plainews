@@ -9,7 +9,7 @@ from model.feed import Feed, FeedEntry
 
 def parse_rss_feed(feed_url: str) -> Feed:
     rss = feedparser.parse(feed_url)
-    title = rss.feed.title
+    title = rss.feed.title if 'title' in rss.feed else None
     subtitle = rss.feed.subtitle if 'subtitle' in rss.feed else None
     entries = []
     for entry in rss.entries:
