@@ -82,9 +82,8 @@ class ReaderView(Widget):
             await self.refresh_selected_feed()
         if isinstance(option.option_list, ArticlesList):
             self.selected_entry = self.selected_feed.entries[option.option_index]
-            self.selected_article = self.feed_manager.extract_article(self.selected_entry)
+            self._extract_article(self.selected_entry)
             self.selected_entry.meta.is_read = True
-            self.update_article_screen(self.selected_article)
             self.feed_manager.save_feeds()
             await self.refresh_selected_feed()
 
@@ -159,6 +158,10 @@ class ReaderView(Widget):
         self.selected_article = version.article
         self.update_article_screen(version.article)
 
+    @work(exclusive=True, exit_on_error=False, name='extract_article', thread=True)
+    async def _extract_article(self, feed_entry: FeedEntry):
+        self.selected_article = self.feed_manager.extract_article(feed_entry)
+
     async def on_worker_state_changed(self, event: Worker.StateChanged) -> None:
         """Called when the worker state changes."""
         if event.state == WorkerState.ERROR:
@@ -170,6 +173,8 @@ class ReaderView(Widget):
         if event.worker.name == 'refresh_feeds' and event.state == WorkerState.SUCCESS:
             feeds = event.worker.result
             self._update_feeds_list(feeds)
+        if event.worker.name == 'extract_article':
+            self._handle_extract_article_update(event)
 
     def _article_screen(self) -> ArticleView | None:
         return self.query_one(ArticleView)
@@ -227,3 +232,11 @@ class ReaderView(Widget):
         }
         return titles_dict[worker.name] if worker.name in titles_dict else None
 
+    def _handle_extract_article_update(self, event: Worker.StateChanged):
+        if event.state == WorkerState.RUNNING:
+            self._article_screen().toggle_loading(True)
+        elif event.state == WorkerState.SUCCESS:
+            self.update_article_screen(self.selected_article)
+            self._article_screen().toggle_loading(False)
+        elif event.state == WorkerState.ERROR:
+            self._article_screen().toggle_loading(False)
