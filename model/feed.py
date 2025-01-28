@@ -29,8 +29,8 @@ class FeedEntry(BaseModel):
     entry_id: str
     title: str
     link: str
-    publish_date: datetime
-    update_date: datetime
+    publish_date: datetime | None
+    update_date: datetime | None
     summary: str
 
     meta: FeedEntryMeta = FeedEntryMeta()

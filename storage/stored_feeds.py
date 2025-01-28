@@ -78,7 +78,7 @@ class StoredFeeds:
         merged_set = set(existing_feed.entries)
         merged_set.update(new_feed.entries)
         return Feed(
-            entries=sorted(list(merged_set), key=lambda e: e.update_date, reverse=True),
+            entries=sorted(list(merged_set), key=lambda e: (e.update_date is None, e.update_date), reverse=True),
             url=new_feed.url,
             title=new_feed.title,
             subtitle=new_feed.subtitle,
