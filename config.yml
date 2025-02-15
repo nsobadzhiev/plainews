@@ -7,5 +7,12 @@ followed_feeds:
     - https://www.faz.net/rss/aktuell
     - https://world.hey.com/dhh/feed.atom
     - https://medium.com/feed/@n.sobadjiev_2847
+    - https://techcrunch.com/feed
+    - https://entrepreneur.com/latest.rss
+    - https://feeds.bbci.co.uk/news/world/rss.xml
+    - http://www.aaronsw.com/2002/feeds/pgessays.rss
+    - https://news.ycombinator.com/rss
+    - https://www.producthunt.com/feed
+    - https://news.google.com/rss/search?q=%22Backend%20development%22%20when%3A7d&hl=en-US&gl=US&ceid=US%3Aen
 history:
     keep_history: true

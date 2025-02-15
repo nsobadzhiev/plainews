@@ -149,3 +149,9 @@ poetry run python app.py
 
 From my experience, most of the time the useful information can be extracted from a webpage easily using some locally running libraries. Namely, the [Newspaper3k](https://github.com/codelucas/newspaper/) python library does a fairly good job in this project.
 In the future, we might use LLMs to handle the more complicated cases.
+
+## What feeds to follow
+
+I know many people want to follow more news and keep up to date, but they struggle to find publications to follow. If you are one of them, I can give you some inspiration, at least for the tech domain.
+
+You will find my recommendations in the [feed recommendations](./FEED_RECOMMENDATIONS.md) section.
