@@ -9,7 +9,6 @@ from textual.app import ComposeResult
 from textual.widget import Widget
 from textual.widgets import Header, Footer, OptionList
 from textual.widgets.option_list import Option
-from textual.widgets.option_list import Separator
 from textual.worker import Worker, WorkerState
 
 from ai.tts import speak_text, TextToSpeech, has_tts_setup
@@ -85,7 +84,9 @@ class ReaderView(Widget):
             self._extract_article(self.selected_entry)
             self.selected_entry.meta.is_read = True
             self.feed_manager.save_feeds()
-            await self.refresh_selected_feed()
+            articles_list_view = self.query_exactly_one(selector=f'#sidebar-articles', expect_type=ArticlesList)
+            articles_list_view.replace_option_prompt_at_index(option.option_index,
+                                                              Text(self.selected_entry.title, style='italic'))
 
     def action_open_in_browser(self):
         if self.selected_entry:
@@ -203,7 +204,7 @@ class ReaderView(Widget):
         return self.query_exactly_one(selector=f'#{FeedsList.OPTIONS_LIST_ID}', expect_type=OptionList)
 
     @staticmethod
-    def _options_for_feed(feed: Feed) -> list[Option | Separator]:
+    def _options_for_feed(feed: Feed) -> list[Option | None]:
         """
         Returns the options to be added to the FeedsList, sorted chronologically
         :param feed: the selected Feed whose articles will be listed
@@ -212,8 +213,8 @@ class ReaderView(Widget):
         options = []
         for entry in feed.entries:
             style = 'italic' if hasattr(entry, 'meta') and entry.meta.is_read else 'bold'
-            options.append(Text(entry.title, style=style))
-            options.append(Separator())
+            options.append(Option(Text(entry.title, style=style)))
+            options.append(None)
         return options
 
     def _restore_selection(self):
