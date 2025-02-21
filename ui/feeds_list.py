@@ -25,12 +25,6 @@ class FeedsList(Widget):
 
     def compose(self) -> ComposeResult:
         yield OptionList(*self._feed_items, id=self.OPTIONS_LIST_ID)
-        yield Button('Since you were last here', id='latest_button')
-
-    @on(Button.Pressed, selector='#latest_button')
-    def on_latest_articles_pressed(self, button: Button):
-        articles_screen = LatestArticlesScreen()
-        self.app.push_screen(articles_screen)
 
     @property
     def feed_items(self) -> list[str]:

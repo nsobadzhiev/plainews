@@ -10,6 +10,7 @@ from textual.widget import Widget
 from textual.widgets import Header, Footer, OptionList
 from textual.widgets.option_list import Option
 from textual.worker import Worker, WorkerState
+from rich.table import Table
 
 from ai.tts import speak_text, TextToSpeech, has_tts_setup
 from config.config import Config
@@ -23,6 +24,7 @@ from rich.text import Text
 from ui.article_view import ArticleView
 from ui.articles_list import ArticlesList
 from ui.feeds_list import FeedsList
+from ui.latest_articles_screen import LatestArticlesScreen
 
 logger = logging.getLogger(__name__)
 
@@ -74,11 +76,16 @@ class ReaderView(Widget):
         yield Footer()
 
     @on(OptionList.OptionSelected)
-    async def feed_selected(self, option: OptionList.OptionSelected):
+    async def option_selected(self, option: OptionList.OptionSelected):
         if option.option_list is self.feeds_option_list:
-            selected_index = option.option_index
-            self.selected_feed = self.feed_manager.get_feeds()[selected_index]
-            await self.refresh_selected_feed()
+            if option.option_index < len(self._service_feed_rows()):
+                articles_screen = LatestArticlesScreen()
+                await self.app.push_screen(articles_screen)
+            else:
+                # adjusts for the added hardcoded rows in the beginning of the list
+                selected_index = option.option_index - len(self._service_feed_rows())
+                self.selected_feed = self.feed_manager.get_feeds()[selected_index]
+                await self.refresh_selected_feed()
         if isinstance(option.option_list, ArticlesList):
             self.selected_entry = self.selected_feed.entries[option.option_index]
             self._extract_article(self.selected_entry)
@@ -181,9 +188,26 @@ class ReaderView(Widget):
         return self.query_one(ArticleView)
 
     def _update_feeds_list(self, feeds: list[Feed]):
-        feeds_titles = [feed.title for feed in feeds]
+        feed_titles = self._service_feed_rows()
+        # add a separator in-between
+        feed_titles.append(None)
+        for feed in feeds:
+            feed_titles.append(feed.title)
+            feed_titles.append(None)
         self.feeds_option_list.clear_options()
-        self.feeds_option_list.add_options(feeds_titles)
+        self.feeds_option_list.add_options(feed_titles)
+
+    @staticmethod
+    def _service_feed_rows() -> list:
+        """
+        There are rows added to the feeds options list that are not actually feeds, but hardcoded
+        rows from the application itself. For instance, the "New articles" section - an app generated
+        feed with new articles since the app was last opened
+        :return: a list of Options - objects that can be added as cells in a OptionList
+        """
+        last_updated = Table('New articles', expand=True, title_justify='center', caption_justify='center')
+        last_updated.add_row('Since you were last here')
+        return [last_updated]
 
     def update_article_screen(self, article: Article):
         screen = self._article_screen()
