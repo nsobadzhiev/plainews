@@ -15,7 +15,7 @@ def articles_since(since_date: datetime, force_fetch: bool) -> list[FeedEntry]:
         feed_manager.session_manager.update_last_feed_refresh(datetime.now())
     feeds = feed_manager.get_feeds()
     entries = functools.reduce(lambda a, b: a + b.entries, feeds, [])
-    return list(filter(lambda e: since_date < e.publish_date, entries))
+    return list(filter(lambda e: since_date < e.publish_date if e.publish_date else datetime.min, entries))
 
 
 async def latest_articles_summary(since_date: datetime, force_fetch: bool) -> Article:
