@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "plainews"
-version = "0.8.2"
+version = "0.9.0"
 description = "Distraction and clutter free reading"
 authors = ["Nikola <nikola@kumulintelligence.com>"]
 readme = "README.md"
@@ -43,7 +43,7 @@ Issues = "https://github.com/nsobadzhiev/plainews/issues"
 
 [project]
 name = "plainews"
-version = "0.8.2"
+version = "0.9.0"
 authors = [
   { name="Nikola Sobadjiev", email="nikola@kumulintelligence.com" },
 ]
