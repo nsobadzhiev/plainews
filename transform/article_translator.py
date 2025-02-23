@@ -13,7 +13,7 @@ class ArticleTranslator(ArticleTransformer):
         """
         Returns the same contents in a different language (target_language)
         """
-        translated_article: Article = article.copy()
+        translated_article: Article = article.model_copy()
         translated_article.text = await translate_text(article.text, self.target_language)
         return TranslatedArticle(
             language=self.target_language,

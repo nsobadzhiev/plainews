@@ -126,12 +126,20 @@ class ArticleView(Widget):
         self.update_text()
 
     async def _apply_transformer(self, transformer: ArticleTransformer):
-        self.toggle_loading(True)
-        if self.selected_entry:
-            version = await self.feed_manager.create_article_version(self.selected_entry, transformer)
-            self.selected_article = version.article
-        else:
-            new_version = await transformer.transformed_article(self.selected_article)
-            self.selected_article = new_version.article
-        self._update_view(self.selected_article)
-        self.toggle_loading(False)
+        try:
+            self.toggle_loading(True)
+            if self.selected_entry:
+                version = await self.feed_manager.create_article_version(self.selected_entry, transformer)
+                self.selected_article = version.article
+            else:
+                new_version = await transformer.transformed_article(self.selected_article)
+                self.selected_article = new_version.article
+            self._update_view(self.selected_article)
+        except Exception as e:
+            self.notify(
+                title=f"Failed to transform article",
+                message=str(e),
+                severity='error'
+            )
+        finally:
+            self.toggle_loading(False)

@@ -13,7 +13,7 @@ class ArticleSummary(ArticleTransformer):
         """
         Returns a more concise version of the source article
         """
-        short_article = article.copy()
+        short_article = article.model_copy()
         short_article.text = await summarize_text(article.text, self.target_length)
         return SummarizedArticle(
             parent_article=article,
