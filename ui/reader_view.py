@@ -18,11 +18,14 @@ from model.article import Article
 from model.feed import Feed, FeedEntry
 from model.feed_manager import FeedManager
 from model.session_manager import SessionManager
+from model.opml import generate_opml
 from transform.article_summary import ArticleSummary
 from transform.article_translator import ArticleTranslator
 from rich.text import Text
 from ui.article_view import ArticleView
 from ui.articles_list import ArticlesList
+from ui.config_file_screen import ConfigFileScreen
+from ui.config_file_view import ConfigFileView
 from ui.feeds_list import FeedsList
 from ui.latest_articles_screen import LatestArticlesScreen
 
@@ -35,6 +38,7 @@ class ReaderView(Widget):
 
     BINDINGS = [
         ("r", "refresh_feeds", "Refresh"),
+        ("e", "export_feeds", "Export feeds"),
     ]
 
     config = Config()
@@ -112,6 +116,18 @@ class ReaderView(Widget):
     async def action_refresh_feeds(self):
         self.selected_feed = self.feed_manager.refresh_feed(self.selected_feed)
         await self.refresh_selected_feed()
+
+    async def action_export_feeds(self):
+        feeds = self.feed_manager.get_feeds()
+        await self.app.push_screen(
+            ConfigFileScreen(
+                ConfigFileView(
+                    title="Feeds",
+                    text=generate_opml(feeds),
+                    language="xml"
+                )
+            )
+        )
 
     async def action_speak_article(self):
         if self.tts and self.tts.is_playing():
